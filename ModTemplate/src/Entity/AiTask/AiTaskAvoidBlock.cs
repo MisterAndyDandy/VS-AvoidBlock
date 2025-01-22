@@ -12,9 +12,6 @@ namespace AvoidBlock.Entity.AiTask
         // The code of the block that the entity should avoid
         private string blockCode = "npccollider";
 
-        //Priority over all because we need to.
-        public override float Priority => 3.5f;
-
         //Entity has avoid block.
         public bool isAvoidBlock { get; set; }
 
