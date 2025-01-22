@@ -1,0 +1,11 @@
+{
+    "type": "code",
+    "modid": "avoidblock",
+    "name": "Avoid Block",
+    "description": "",
+    "authors": [ "Mister Andy Dandy" ],
+    "version": "1.0.0",
+    "dependencies": {
+        "game": ""
+    }
+}
