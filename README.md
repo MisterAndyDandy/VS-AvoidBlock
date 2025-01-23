@@ -17,6 +17,7 @@ example I was using trader and be sure that priority is highest
 
 [trader-buildmaterials.json](https://github.com/user-attachments/files/18512996/trader-buildmaterials.json)
 
+```json
 {
 	code: "taskai",
 	aitasks: [
@@ -26,8 +27,10 @@ example I was using trader and be sure that priority is highest
 		}
 	]
 },
+```
 
-or use the config 
+or use the config, it should generate within `VintagestoryData\ModConfig`
+
 
 [EntityList.json](https://github.com/user-attachments/files/18526469/EntityList.json)
 
