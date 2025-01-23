@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Vintagestory.API.Common;
+﻿using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
@@ -10,7 +8,7 @@ namespace AvoidBlock.Entity.AiTask
     public class AiTaskAvoidBlock : AiTaskBase
     {
         // The code of the block that the entity should avoid
-        private string blockCode = "npccollider";
+        private string blockCode = "game:meta-barrier";
 
         //Entity has avoid block.
         public bool isAvoidBlock { get; set; }
@@ -43,13 +41,13 @@ namespace AvoidBlock.Entity.AiTask
             if(avoidBlock == null) return false;
 
             // If the block ahead is not the "npccollider", check the block above it
-            if (avoidBlock.Code.EndVariant() != "npccollider")
+            if (avoidBlock.Code != blockCode)
             {
                 avoidBlock = world.BlockAccessor.GetBlockAbove(avoidBlockPos);
             }
 
             // No block to avoid, continue normal behavior
-            return avoidBlock.Code.EndVariant() == blockCode;  
+            return avoidBlock.Code == blockCode;  
         }
 
         // Called when the AI task starts executing

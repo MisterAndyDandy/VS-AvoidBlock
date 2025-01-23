@@ -1,0 +1,31 @@
+{
+	"code": "meta-barrier",
+	"enabled": "true",
+	"shape": { "base": "block/basic/cube" },
+	"attributes": {
+		"handbook": {
+			"exclude": true
+		}
+	},
+	"drawtype": "cube",
+	"creativeinventory": { "meta": [ "*" ] },
+	"blockmaterial": "Meta",
+	"faceCullMode": "Merge",
+	"vertexFlags": {
+		"zOffset": 7
+	},
+	"renderPass": "meta",
+	"lightAbsorption": 0,
+	"replaceable": 900,
+	"textures": {
+		"all": { "base": "block/meta/invisible" }
+	},
+	"resistance": 999999,
+	"sideopaque": {
+		"all": false
+	},
+	"sidesolid": {
+		"all": true
+	},
+	"collisionbox": null
+}

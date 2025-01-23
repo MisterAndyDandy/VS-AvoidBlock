@@ -55,6 +55,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="assets\" />
+    <Folder Include="assets\game\blocktypes\meta\" />
   </ItemGroup>
 </Project>

@@ -35,13 +35,13 @@ namespace AvoidBlock.Util
                 if (block == null) return;
 
                 // If the block isn't "npccollider", check one block above it
-                if (block?.Code.EndVariant() != "npccollider")
+                if (block?.Code != "game:meta-barrier")
                 {
                     block = world.BlockAccessor.GetBlock(forwardPos.Offset(BlockFacing.UP));
                 }
 
                 // If the block is an "npccollider", prevent AI from continuing movement
-                if (block?.Code.EndVariant() == "npccollider")
+                if (block?.Code == "game:meta-barrier")
                 {
                     __result = false;  // Stop the AI task execution
                     return;
