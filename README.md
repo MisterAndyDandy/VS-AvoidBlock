@@ -15,6 +15,7 @@ VS-AvoidBlock is a mod for Vintage Story that allows modders and server administ
 ### How to use
 
 example I was using trader and be sure that priority is highest
+[trader-buildmaterials.json](https://github.com/user-attachments/files/18512996/trader-buildmaterials.json)
 
 {
 	code: "taskai",
@@ -25,6 +26,9 @@ example I was using trader and be sure that priority is highest
 		}
 	]
 },
+
+I used meta block to stop entities passing through block it self.
+[meta.json](https://github.com/user-attachments/files/18512982/meta.json)
 
 ### Compatibility
 Vintage Story Version: 1.20+
@@ -39,3 +43,5 @@ Have issues or suggestions? Contact us via:
 
 ### License
 This mod is licensed under the MIT License, meaning you are free to use, modify, and distribute it with attribution.
+
+
