@@ -29,7 +29,7 @@ example I was using trader and be sure that priority is highest
 },
 ```
 
-or use the config, it should generate within `VintagestoryData\ModConfig` [EntityList.json](https://github.com/user-attachments/files/18526469/EntityList.json)
+Alternatively, use the configuration file which should be generated `VintagestoryData\Config` [EntityList.json](https://github.com/userattachments/files/18526469/EntityList.json)
 
 I used creativebarrier block to stop entities passing through block it self.
 [creativebarrier.json](https://github.com/user-attachments/files/18526468/creativebarrier.json)
