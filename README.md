@@ -1,4 +1,3 @@
-[creativebarrier.json](https://github.com/user-attachments/files/18526467/creativebarrier.json)
 # VS-AvoidBlock Mod
 <a name="my-custom-anchor-point"></a>
 A Vintage Story Mod to guide NPCs away from certain blocks
