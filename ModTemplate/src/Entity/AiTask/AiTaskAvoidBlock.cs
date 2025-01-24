@@ -1,15 +1,16 @@
-﻿using Vintagestory.API.Common;
+﻿using System.IO;
+using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
+using System.Collections.Generic;
+using static AvoidBlock.AvoidBlockCore;
+using Vintagestory.GameContent;
 
 namespace AvoidBlock.Entity.AiTask
 {
     public class AiTaskAvoidBlock : AiTaskBase
     {
-        // The code of the block that the entity should avoid
-        private string blockCode = "game:meta-barrier";
-
         //Entity has avoid block.
         public bool isAvoidBlock { get; set; }
 
@@ -32,22 +33,38 @@ namespace AvoidBlock.Entity.AiTask
         // Determines whether the AI should start executing the task
         public override bool ShouldExecute()
         {
+            Dictionary<string, string[]> entitiesAndBlocks = AvoidBlockMod.Config.EntitiesAndBlocks;
+
             // Get the block position 1 step ahead of the entity
             avoidBlockPos = entityPos?.HorizontalAheadCopy(1).AsBlockPos;
 
             // Retrieve the block at the forward position
             avoidBlock = world.BlockAccessor.GetBlock(avoidBlockPos);
 
-            if(avoidBlock == null) return false;
+            if (avoidBlock == null) return false;
 
-            // If the block ahead is not the "npccollider", check the block above it
-            if (avoidBlock.Code != blockCode)
+            return MatchFound(entitiesAndBlocks, avoidBlock) || MatchFound(entitiesAndBlocks, world.BlockAccessor.GetBlockAbove(avoidBlockPos));
+        }
+
+        private bool MatchFound(Dictionary<string, string[]> entitiesAndBlocks, Block blockToCheck)
+        {
+            foreach (var types in entitiesAndBlocks)
             {
-                avoidBlock = world.BlockAccessor.GetBlockAbove(avoidBlockPos);
+                // Match entity using regex pattern
+                if (WildcardUtil.Match(types.Key, entity.Code.ToString()))
+                {
+                    foreach (string blockPattern in types.Value)
+                    {
+                        // Match block against the stored patterns
+                        if (blockToCheck != null && WildcardUtil.Match(blockPattern, blockToCheck.Code.ToString()))
+                        {
+                            return true;  // Block should be avoided
+                        }
+                    }
+                }
             }
 
-            // No block to avoid, continue normal behavior
-            return avoidBlock.Code == blockCode;  
+            return false;
         }
 
         // Called when the AI task starts executing
@@ -88,6 +105,7 @@ namespace AvoidBlock.Entity.AiTask
             foreach (Vec3d direction in possibleDirections)
             {
                 BlockPos targetPos = direction.AsBlockPos;
+
                 Block targetBlock = world.BlockAccessor.GetBlock(targetPos);
 
                 // Check if the block is passable (not solid)

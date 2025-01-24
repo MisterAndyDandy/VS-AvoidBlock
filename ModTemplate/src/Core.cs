@@ -6,6 +6,8 @@ using AvoidBlock.Entity.AiTask;
 using System.Linq;
 using System;
 using Vintagestory.API.Util;
+using System.Collections.Generic;
+using Vintagestory.API.Datastructures;
 
 namespace AvoidBlock
 {
@@ -13,14 +15,22 @@ namespace AvoidBlock
     {
         public class ServerConfig
         {
-            public string Entities { get; set; } = "@.*(trader).*";
+            public bool DebugLogger { get; set; } = false;
+
+            // Dictionary to store various string arrays with meaningful keys
+            public Dictionary<string, string[]> EntitiesAndBlocks { get; set; } = new Dictionary<string, string[]>
+            {
+                { 
+                    "@.*(trader).*", new string[] { "@.*(meta-barrier|fence).*" } 
+                }
+            };
         }
 
         public class AvoidBlockMod : ModSystem
         {
             private Harmony harmony;
 
-            private ILogger logger;
+            private ILogger Logger;
 
             internal static readonly string ConfigName = "EntitiesList.json";
 
@@ -33,7 +43,7 @@ namespace AvoidBlock
                 //Server side only.
                 if (api.Side == EnumAppSide.Server) 
                 {
-                    logger = api.Logger;
+                    Logger = api.Logger;
 
                     try
                     {
@@ -44,23 +54,23 @@ namespace AvoidBlock
                         {
                             // Create a new config if not found
                             Config = new ServerConfig();
-                            logger.VerboseDebug($"Config file '{ConfigName}' not found. Creating a new one with default values...");
+                            Logger.VerboseDebug($"Config file '{ConfigName}' not found. Creating a new one with default values...");
                             api.StoreModConfig(Config, ConfigName);
                         }
                         else
                         {
                             // Store the loaded config back to ensure all default values are present
                             api.StoreModConfig(Config, ConfigName);
-                            logger.VerboseDebug($"Config file '{ConfigName}' loaded successfully.");
+                            Logger.VerboseDebug($"Config file '{ConfigName}' loaded successfully.");
                         }
                     }
                     catch (Exception e)
                     {
                         // Log detailed error information and create a fallback config
-                        logger.Error($"Failed to load config file '{ConfigName}'. Error: {e.Message}");
+                        Logger.Error($"Failed to load config file '{ConfigName}'. Error: {e.Message}");
                         Config = new ServerConfig();
                         api.StoreModConfig(Config, ConfigName);
-                        logger.Error("A new config file with default values has been created.");
+                        Logger.Error("A new config file with default values has been created.");
                     }
                 }
             }
@@ -69,7 +79,7 @@ namespace AvoidBlock
             {
                 base.StartServerSide(api);
 
-                logger = api.Logger;
+                Logger = api.Logger;
 
                 // Register AI task
                 AiTaskRegistry.Register<AiTaskAvoidBlock>("avoidblock");
@@ -82,8 +92,7 @@ namespace AvoidBlock
 
                 harmony.PatchAll();
 
-                logger?.Notification("AvoidBlockMod: Harmony patches applied.");
-
+                DebugLogger("AvoidBlockMod: Harmony patches applied.");
 
             }
 
@@ -102,7 +111,16 @@ namespace AvoidBlock
 
                     if (taskAI != null)
                     {
-                        bool value = WildcardUtil.Match(Config.Entities, entity.Code.ToString());
+                        string entitycode = string.Empty;
+
+                        foreach (var code in Config.EntitiesAndBlocks.Keys) 
+                        {
+                            if (string.IsNullOrEmpty(code)) break;
+
+                            entitycode = code;
+                        }
+
+                        bool value = WildcardUtil.Match(entitycode, entity.Code.ToString());
 
                         if (value)
                         {
@@ -114,7 +132,7 @@ namespace AvoidBlock
 
                                 taskAI.TaskManager.AddTask(avoidBlockTask);
 
-                                entity.Api.Logger.Notification($"Added AvoidBlock AI task to {entity.Code}");
+                                DebugLogger($"Added AvoidBlock AI task to {entity.Code}");
                             }
                         }
 
@@ -128,10 +146,18 @@ namespace AvoidBlock
                 if (harmony != null)
                 {
                     harmony.UnpatchAll(harmony.Id);
-                    logger?.Notification("AvoidBlockMod: Harmony patches removed.");
+
+                    DebugLogger("AvoidBlockMod: Harmony patches removed.");
                 }
 
                 base.Dispose();
+            }
+
+            public void DebugLogger(string text) 
+            {
+                if (Config.DebugLogger) return;
+
+                Logger?.Notification(text);
             }
         }
     }
