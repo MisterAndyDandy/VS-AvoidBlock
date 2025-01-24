@@ -4,6 +4,7 @@ using Vintagestory.API.Common.Entities;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
 using System.Collections.Generic;
+using AvoidBlock.Util;
 using static AvoidBlock.AvoidBlockCore;
 using Vintagestory.GameContent;
 
@@ -36,35 +37,17 @@ namespace AvoidBlock.Entity.AiTask
             Dictionary<string, string[]> entitiesAndBlocks = AvoidBlockMod.Config.EntitiesAndBlocks;
 
             // Get the block position 1 step ahead of the entity
-            avoidBlockPos = entityPos?.HorizontalAheadCopy(1).AsBlockPos;
+            avoidBlockPos = entityPos.HorizontalAheadCopy(1).AsBlockPos;
 
             // Retrieve the block at the forward position
             avoidBlock = world.BlockAccessor.GetBlock(avoidBlockPos);
 
-            if (avoidBlock == null) return false;
+            bool value1 = Helper.MatchFound(entitiesAndBlocks, entity, avoidBlock);
 
-            return MatchFound(entitiesAndBlocks, avoidBlock) || MatchFound(entitiesAndBlocks, world.BlockAccessor.GetBlockAbove(avoidBlockPos));
-        }
+            bool value2 = Helper.MatchFound(entitiesAndBlocks, entity, world.BlockAccessor.GetBlockAbove(avoidBlockPos));
 
-        private bool MatchFound(Dictionary<string, string[]> entitiesAndBlocks, Block blockToCheck)
-        {
-            foreach (var types in entitiesAndBlocks)
-            {
-                // Match entity using regex pattern
-                if (WildcardUtil.Match(types.Key, entity.Code.ToString()))
-                {
-                    foreach (string blockPattern in types.Value)
-                    {
-                        // Match block against the stored patterns
-                        if (blockToCheck != null && WildcardUtil.Match(blockPattern, blockToCheck.Code.ToString()))
-                        {
-                            return true;  // Block should be avoided
-                        }
-                    }
-                }
-            }
-
-            return false;
+            return value1 || value2;
+            
         }
 
         // Called when the AI task starts executing
@@ -72,16 +55,9 @@ namespace AvoidBlock.Entity.AiTask
         {
             Vec3d avoidDirection = FindSafeDirection();
 
-            // If no safe direction is found, stay in place
-            if (avoidDirection == null)
-            {
-                return;
-            }
+            isAvoidBlock = false;
 
             pathTraverser.WalkTowards(avoidDirection, 0.5f, 1f, GetOnGoalReached, OnStuck);
-
-            isAvoidBlock = false;
-        
         }
 
         private void OnStuck()
@@ -115,7 +91,7 @@ namespace AvoidBlock.Entity.AiTask
                 }
             }
 
-            return null;  // No safe space found, stay in place
+            return entity.ServerPos.XYZ;  // No safe space found, stay in place
         }
 
         public override bool CanContinueExecute()

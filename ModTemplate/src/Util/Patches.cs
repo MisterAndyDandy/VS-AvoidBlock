@@ -1,7 +1,10 @@
-﻿using HarmonyLib;
+﻿using System.Collections.Generic;
+using HarmonyLib;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
+using Vintagestory.API.Util;
 using Vintagestory.GameContent;
+using static AvoidBlock.AvoidBlockCore;
 
 namespace AvoidBlock.Util
 {
@@ -25,28 +28,23 @@ namespace AvoidBlock.Util
 
                 if (world == null) return;
 
+                Dictionary<string, string[]> entitiesAndBlocks = AvoidBlockMod.Config.EntitiesAndBlocks;
+
                 // Get the position 1 block ahead of the entity
                 BlockPos forwardPos = __instance.entity.Pos.HorizontalAheadCopy(1).AsBlockPos;
 
                 // Retrieve the block at the forward position
-                Block block = world.BlockAccessor.GetBlock(forwardPos);
+                Block avoidBlock = world.BlockAccessor.GetBlock(forwardPos);
 
-                // Block is null return instead of doing the patch
-                if (block == null) return;
-
-                // If the block isn't "npccollider", check one block above it
-                if (block?.Code != "game:meta-barrier")
+                if (Helper.MatchFound(entitiesAndBlocks, __instance.entity, avoidBlock) || Helper.MatchFound(entitiesAndBlocks, __instance.entity, world.BlockAccessor.GetBlockAbove(forwardPos)))
                 {
-                    block = world.BlockAccessor.GetBlock(forwardPos.Offset(BlockFacing.UP));
+                    __result = false;
                 }
-
-                // If the block is an "npccollider", prevent AI from continuing movement
-                if (block?.Code == "game:meta-barrier")
+                else 
                 {
-                    __result = false;  // Stop the AI task execution
-                    return;
+                    __result = true;
                 }
-            }
+            }   
         }
 
         /// <summary>
